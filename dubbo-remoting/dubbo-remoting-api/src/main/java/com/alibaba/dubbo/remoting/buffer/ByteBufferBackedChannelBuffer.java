@@ -1,11 +1,12 @@
 /*
- * Copyright 1999-2012 Alibaba Group.
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,11 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
-/**
- * @author <a href="mailto:gang.lvg@alibaba-inc.com">kimi</a>
- */
 public class ByteBufferBackedChannelBuffer extends AbstractChannelBuffer {
 
     private final ByteBuffer buffer;
@@ -41,12 +38,13 @@ public class ByteBufferBackedChannelBuffer extends AbstractChannelBuffer {
         writerIndex(capacity);
     }
 
-    private ByteBufferBackedChannelBuffer(ByteBufferBackedChannelBuffer buffer) {
+    public ByteBufferBackedChannelBuffer(ByteBufferBackedChannelBuffer buffer) {
         this.buffer = buffer.buffer;
         capacity = buffer.capacity;
         setIndex(buffer.readerIndex(), buffer.writerIndex());
     }
 
+    @Override
     public ChannelBufferFactory factory() {
         if (buffer.isDirect()) {
             return DirectChannelBufferFactory.getInstance();
@@ -55,10 +53,12 @@ public class ByteBufferBackedChannelBuffer extends AbstractChannelBuffer {
         }
     }
 
+
     @Override
     public int capacity() {
         return capacity;
     }
+
 
     @Override
     public ChannelBuffer copy(int index, int length) {
@@ -70,17 +70,19 @@ public class ByteBufferBackedChannelBuffer extends AbstractChannelBuffer {
         }
 
         ByteBuffer dst = buffer.isDirect()
-            ? ByteBuffer.allocateDirect(length)
-            : ByteBuffer.allocate(length);
+                ? ByteBuffer.allocateDirect(length)
+                : ByteBuffer.allocate(length);
         dst.put(src);
         dst.clear();
         return new ByteBufferBackedChannelBuffer(dst);
     }
 
+
     @Override
     public byte getByte(int index) {
         return buffer.get(index);
     }
+
 
     @Override
     public void getBytes(int index, byte[] dst, int dstIndex, int length) {
@@ -93,6 +95,7 @@ public class ByteBufferBackedChannelBuffer extends AbstractChannelBuffer {
         data.get(dst, dstIndex, length);
     }
 
+
     @Override
     public void getBytes(int index, ByteBuffer dst) {
         ByteBuffer data = buffer.duplicate();
@@ -104,6 +107,7 @@ public class ByteBufferBackedChannelBuffer extends AbstractChannelBuffer {
         }
         dst.put(data);
     }
+
 
     @Override
     public void getBytes(int index, ChannelBuffer dst, int dstIndex, int length) {
@@ -120,6 +124,7 @@ public class ByteBufferBackedChannelBuffer extends AbstractChannelBuffer {
         }
     }
 
+
     @Override
     public void getBytes(int index, OutputStream out, int length) throws IOException {
         if (length == 0) {
@@ -128,9 +133,9 @@ public class ByteBufferBackedChannelBuffer extends AbstractChannelBuffer {
 
         if (buffer.hasArray()) {
             out.write(
-                buffer.array(),
-                index + buffer.arrayOffset(),
-                length);
+                    buffer.array(),
+                    index + buffer.arrayOffset(),
+                    length);
         } else {
             byte[] tmp = new byte[length];
             ((ByteBuffer) buffer.duplicate().position(index)).get(tmp);
@@ -138,15 +143,18 @@ public class ByteBufferBackedChannelBuffer extends AbstractChannelBuffer {
         }
     }
 
+
     @Override
     public boolean isDirect() {
         return buffer.isDirect();
     }
 
+
     @Override
     public void setByte(int index, int value) {
         buffer.put(index, (byte) value);
     }
+
 
     @Override
     public void setBytes(int index, byte[] src, int srcIndex, int length) {
@@ -155,12 +163,14 @@ public class ByteBufferBackedChannelBuffer extends AbstractChannelBuffer {
         data.put(src, srcIndex, length);
     }
 
+
     @Override
     public void setBytes(int index, ByteBuffer src) {
         ByteBuffer data = buffer.duplicate();
         data.limit(index + src.remaining()).position(index);
         data.put(src);
     }
+
 
     @Override
     public void setBytes(int index, ChannelBuffer src, int srcIndex, int length) {
@@ -177,15 +187,17 @@ public class ByteBufferBackedChannelBuffer extends AbstractChannelBuffer {
         }
     }
 
+
     @Override
     public ByteBuffer toByteBuffer(int index, int length) {
         if (index == 0 && length == capacity()) {
             return buffer.duplicate();
         } else {
             return ((ByteBuffer) buffer.duplicate().position(
-                index).limit(index + length)).slice();
+                    index).limit(index + length)).slice();
         }
     }
+
 
     @Override
     public int setBytes(int index, InputStream in, int length) throws IOException {
@@ -227,15 +239,18 @@ public class ByteBufferBackedChannelBuffer extends AbstractChannelBuffer {
         return readBytes;
     }
 
+
     @Override
     public byte[] array() {
         return buffer.array();
     }
 
+
     @Override
     public boolean hasArray() {
         return buffer.hasArray();
     }
+
 
     @Override
     public int arrayOffset() {
